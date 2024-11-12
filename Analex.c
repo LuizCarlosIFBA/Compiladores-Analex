@@ -32,49 +32,49 @@ TOKEN AnaLex(FILE *fd) {
                     lexema[tamL] = c;
                     lexema[++tamL] = '\0';
                 }
-                else if (c >= '1' && c <= '9') { // inicio de constante inteira - inicializa digitos
+                else if (c >= '0' && c <= '9') { // inicio de constante inteira - inicializa digitos
                     estado = 10;
                     digitos[tamD] = c;
                     digitos[++tamD] = '\0';
                 }
                 else if (c == '+') { // sinal de adicao - monta e devolve token
-                    estado = 3;
+                    estado = 28;
                     t.cat = SN;
                     t.codigo = ADICAO;
                     return t;
                 }
                 else if (c == '-') { // sinal de subtracao - monta e devolve token
-                    estado = 4;
+                    estado = 27;
                     t.cat = SN;
                     t.codigo = SUBTRACAO;
                     return t;
                 }
                 else if (c == '*') { // sinal de multiplicacao - monta e devolve token
-                    estado = 6;
+                    estado = 26;
                     t.cat = SN;
                     t.codigo = MULTIPLIC;
                     return t;
                 }
                 else if (c == '/') { // sinal de divisao - monta e devolve token
-                    estado = 5;
+                    estado = 29;
                     t.cat = SN;
                     t.codigo = DIVISAO;
                     return t;
                 }
                 else if (c == '=') { // sinal de atribuicao - monta e devolve token
-                    estado = 7;
+                    estado = 40;
                     t.cat = SN;
                     t.codigo = ATRIB;
                     return t;
                 }
                 else if (c == '(') { // sinal de abre parenteses - monta e devolve token
-                    estado = 8;
+                    estado = 20;
                     t.cat = SN;
                     t.codigo = ABRE_PAR;
                     return t;
                 }
                 else if (c == ')') { // sinal de fecha parenteses - monta e devolve token
-                    estado = 9;
+                    estado = 21;
                     t.cat = SN;
                     t.codigo = FECHA_PAR;
                     return t;
@@ -114,11 +114,29 @@ TOKEN AnaLex(FILE *fd) {
                     digitos[tamD] = c; // acumula digitos lidos na variavel digitos
                     digitos[++tamD] = '\0';
                 }
+                else if (c == '.') { // ponto decimal encontrado
+                    estado = 12; // vai para estado de número real
+                    digitos[tamD] = c;
+                    digitos[++tamD] = '\0';
+                }
                 else { // transicao OUTRO* do estado 10 do AFD
                     estado = 11; // monta token constante inteira e retorna
                     ungetc(c, fd);
                     t.cat = CT_I;
                     t.valInt = atoi(digitos);
+                    return t;
+                }
+                break;
+
+            case 12: // estado de número real
+                if (c >= '0' && c <= '9') {
+                    digitos[tamD] = c; // acumula dígitos da parte fracionária
+                    digitos[++tamD] = '\0';
+                } else {
+                    estado = 13; // monta token constante real e retorna
+                    ungetc(c, fd);
+                    t.cat = CT_R;
+                    t.valReal = atof(digitos); // converte string para float
                     return t;
                 }
                 break;
@@ -168,6 +186,9 @@ int main() {
                 break;
             case CT_I:
                 printf("<INTCON, %d> ", tk.valInt);
+                break;
+            case CT_R:
+                printf("<REALCON, %.2f> ", tk.valReal);
                 break;
             case FIM_EXPR:
                 printf("<FIM_EXPR, %d>\n", 0);
