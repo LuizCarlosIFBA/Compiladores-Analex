@@ -28,7 +28,7 @@ TOKEN AnaLex(FILE *fd) {
             case 0:
                 if (c == ' ' || c == '\t') estado = 0;
                 else if (c >= 'a' && c <= 'z') { // inicio de identificador - inicializa lexema
-                    estado = 1;
+                    estado = 0;
                     lexema[tamL] = c;
                     lexema[++tamL] = '\0';
                 }
@@ -120,7 +120,7 @@ TOKEN AnaLex(FILE *fd) {
                     digitos[++tamD] = '\0';
                 }
                 else { // transicao OUTRO* do estado 10 do AFD
-                    estado = 11; // monta token constante inteira e retorna
+                    estado = 1; // monta token constante inteira e retorna
                     ungetc(c, fd);
                     t.cat = CT_I;
                     t.valInt = atoi(digitos);
@@ -133,7 +133,7 @@ TOKEN AnaLex(FILE *fd) {
                     digitos[tamD] = c; // acumula dígitos da parte fracionária
                     digitos[++tamD] = '\0';
                 } else {
-                    estado = 13; // monta token constante real e retorna
+                    estado = 6; // monta token constante real e retorna
                     ungetc(c, fd);
                     t.cat = CT_R;
                     t.valReal = atof(digitos); // converte string para float
