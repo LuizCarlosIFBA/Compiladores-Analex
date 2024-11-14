@@ -31,9 +31,12 @@ TOKEN AnaLex(FILE *fd) {
                     estado = 0;
                     lexema[tamL] = c;
                     lexema[++tamL] = '\0';
+                }else if (c == '"') {  // Início de uma string
+                        estado = 9;
+                        tamL = 0; // Reset para acumular string
                 }
                 else if (c >= '0' && c <= '9') { // inicio de constante inteira - inicializa digitos
-                    estado = 10;
+                    estado = 1;
                     digitos[tamD] = c;
                     digitos[++tamD] = '\0';
                 }
@@ -93,7 +96,7 @@ TOKEN AnaLex(FILE *fd) {
                     error("Caracter invalido na expressao!"); // sem transicao valida no AFD
                 break;
 
-            case 1:
+            case 111:
                 if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || (c == '_')) {
                     estado = 1;
                     lexema[tamL] = c; // acumula caracteres lidos em lexema
@@ -108,14 +111,14 @@ TOKEN AnaLex(FILE *fd) {
                 }
                 break;
 
-            case 10:
+            case 1:
                 if (c >= '0' && c <= '9') {
-                    estado = 10;
+                    estado = 2;
                     digitos[tamD] = c; // acumula digitos lidos na variavel digitos
                     digitos[++tamD] = '\0';
                 }
                 else if (c == '.') { // ponto decimal encontrado
-                    estado = 12; // vai para estado de número real
+                    estado = 3; // vai para estado de número real
                     digitos[tamD] = c;
                     digitos[++tamD] = '\0';
                 }
@@ -128,7 +131,7 @@ TOKEN AnaLex(FILE *fd) {
                 }
                 break;
 
-            case 12: // estado de número real
+            case 3: // estado de número real
                 if (c >= '0' && c <= '9') {
                     digitos[tamD] = c; // acumula dígitos da parte fracionária
                     digitos[++tamD] = '\0';
@@ -140,6 +143,22 @@ TOKEN AnaLex(FILE *fd) {
                     return t;
                 }
                 break;
+
+            case 9:  // Estado para capturar conteúdo de uma string
+                if (c >= 32 && c <= 126 && c != '"') { // ASCII imprimível e diferente de aspas
+                    if (tamL < TAM_MAX_LEXEMA - 1) {   // Evita overflow
+                        lexema[tamL++] = c;
+                        lexema[tamL] = '\0';
+                    }
+                } else  if (c == '"') {  // Fim da string
+                            t.cat = CT_S;
+                            strcpy(t.valString, lexema);
+                            return t;
+                        } else {  // Caracter inválido em string
+                            error("Caracter inválido na string!");
+    }
+    break;
+    
         }
     }
 }
@@ -189,6 +208,9 @@ int main() {
                 break;
             case CT_R:
                 printf("<REALCON, %.2f> ", tk.valReal);
+                break;
+            case CT_S:
+                printf("<STRINGCON, \"%s\"> ", tk.valString);
                 break;
             case FIM_EXPR:
                 printf("<FIM_EXPR, %d>\n", 0);
