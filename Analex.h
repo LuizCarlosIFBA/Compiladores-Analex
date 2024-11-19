@@ -3,9 +3,7 @@
 
 #define TAM_MAX_LEXEMA 31
 
-typedef enum{   
-  FIM_ARQ, FIM_EXPR, STRINGCON, CHARCON, SN, CT_I, CT_R, ID
-}TIPO_TOKEN;
+typedef enum{FIM_ARQ, FIM_EXPR, STRINGCON, CHARCON, SN, CT_I, CT_R, ID}TIPO_TOKEN;
 
 typedef struct
 {
