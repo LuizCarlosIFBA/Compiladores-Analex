@@ -82,21 +82,21 @@ TOKEN AnaLex(FILE *fd)
         case 0: // Estado inicial
             if (c == '"')
             { // Início de string
-                estado = 1;
+                estado = 9;
             }
             else if (c == '\'')
             { // Início de caractere
-                estado = 2;
+                estado = 10;
             }
             else if (isdigit(c))
             { // Início de número (inteiro ou real)
                 digitos[tamD++] = c;
                 digitos[tamD] = '\0';
-                estado = 3; // Estado de número
+                estado = 1; // Estado de número
             }
             else if (c == '.')
             { // Ponto, possivelmente para número real
-                estado = 4;
+                estado = 16;
                 digitos[tamD++] = c;
                 digitos[tamD] = '\0';
             }
@@ -107,7 +107,7 @@ TOKEN AnaLex(FILE *fd)
             else if (isalpha(c))
             { // Verifica se é uma letra (possivelmente um identificador ou string)
                 lexema[tamL++] = c;
-                estado = 5; // Estado de string ou identificador
+                estado = -1; // Estado de string ou identificador
             }
             else
             { // Símbolos e operadores
@@ -117,7 +117,7 @@ TOKEN AnaLex(FILE *fd)
             }
             break;
 
-        case 1: // Lê string (delimitada por aspas)
+        case 9: // Lê string (delimitada por aspas)
             if (c == '"')
             { // Fim da string
                 t.cat = STRINGCON;
@@ -131,7 +131,7 @@ TOKEN AnaLex(FILE *fd)
             }
             break;
 
-        case 2: // Lê caractere (delimitado por aspas simples)
+        case 10: // Lê caractere (delimitado por aspas simples)
             if (c == '\'')
             { // Fim do caractere
                 t.cat = CHARCON;
@@ -144,7 +144,7 @@ TOKEN AnaLex(FILE *fd)
             }
             break;
 
-        case 3: // Lê número inteiro ou real
+        case 1: // Lê número inteiro ou real
             if (isdigit(c))
             { // Continua lendo números inteiros
                 digitos[tamD++] = c;
@@ -152,7 +152,7 @@ TOKEN AnaLex(FILE *fd)
             }
             else if (c == '.')
             { // Número real
-                estado = 4;
+                estado = 3;
                 digitos[tamD++] = c;
                 digitos[tamD] = '\0';
             }
@@ -165,7 +165,7 @@ TOKEN AnaLex(FILE *fd)
             }
             break;
 
-        case 4: // Lê número real
+        case 3: // Lê número real
             if (isdigit(c))
             { // Continua lendo número real
                 digitos[tamD++] = c;
@@ -180,7 +180,7 @@ TOKEN AnaLex(FILE *fd)
             }
             break;
 
-        case 5: // Estado de string ou identificador
+        case -1: // Estado de string ou identificador
             if (isalnum(c) || c == '_')
             { // Parte do identificador (letras, números ou underline)
                 lexema[tamL++] = c;
