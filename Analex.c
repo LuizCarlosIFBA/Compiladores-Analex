@@ -31,10 +31,10 @@ TOKEN AnaLex(FILE *fd)
         {
         case 0:
             if (c == ' ' || c == '\t')
-                estado = 8;
+                estado = 0;
             else if (c >= 'a' && c <= 'z')
             { // inicio de identificador - inicializa lexema
-                estado = 0;
+                estado = 8;
                 lexema[tamL] = c;
                 lexema[++tamL] = '\0';
             }
