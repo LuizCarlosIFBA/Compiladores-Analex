@@ -40,7 +40,7 @@ TOKEN AnaLex(FILE *fd)
             }
             else if (c == '"')
             { // Início de uma string
-                estado = 9;
+                estado = 8;
                 tamL = 0; // Reset para acumular string
             }
             else if (c >= '0' && c <= '9')
@@ -100,7 +100,7 @@ TOKEN AnaLex(FILE *fd)
             }
             else if (c == '\n')
             {
-                estado = 0;
+                estado = 33;
                 t.cat = FIM_EXPR; // fim de linha (ou expressao) encontrado
                 contLinha++;
                 return t;
@@ -170,7 +170,7 @@ TOKEN AnaLex(FILE *fd)
             }
             break;
 
-        case 9: // Estado para capturar conteúdo de uma string
+        case 8: // Estado para capturar conteúdo de uma string
             if (c >= 32 && c <= 126 && c != '"')
             { // ASCII imprimível e diferente de aspas
                 if (tamL < TAM_MAX_LEXEMA - 1)
