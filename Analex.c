@@ -179,15 +179,15 @@ TOKEN AnaLex(FILE *fd)
                     lexema[tamL] = '\0';
                 }
             }
-            else if (c == '"')
+            else if (tamL>1)
             { // Fim da string
                 t.cat = CT_S;
                 strcpy(t.valString, lexema);
                 return t;
-            }
-            else
-            { // Caracter inválido em string
-                error("Caracter inválido na string!");
+            }else { // Caracter inválido em string
+                t.cat = CT_C;
+                strcpy(t.valChar, lexema);
+                return t;
             }
             break;
         case 10:
@@ -267,7 +267,7 @@ int main()
             printf("<STRINGCON, \"%s\"> ", tk.valString);
             break;
         case CT_C:
-            printf("<STRINGCON, \"%s\"> ", tk.valChar);
+            printf("<CHARCON, \"%s\"> ", tk.valChar);
             break;
         case FIM_EXPR:
             printf("<FIM_EXPR, %d>\n", 0);
